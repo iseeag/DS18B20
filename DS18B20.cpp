@@ -11,15 +11,48 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "DS18B20.h"
 
-// For DS18B20 in Linux environment 
-#define PATH                "/sys/bus/w1/devices"  // System path to one-wire 
-#define DS18B20_HEAD        "28-"     // the starting two digits 
-#define DS18B20_ID_L        16 // the length of device id 
-#define DS18B20_BUFFER      8 // max number of device
-#define DS18B20_PATH_L      128 // as long as it's longer than PATH + ID_L + W1_READ it's ok
-#define W1_READ             "w1_slave"
-#define DS18B20_DATA_LENGTH 5 // digits reported by device
+
+
+int main() {
+    //setup 
+    uint8_t num;
+    num = numDev(PATH,DS18B20_HEAD);
+    printf("number of device: %i\n", num);
+
+    //get IDs
+    char idList[DS18B20_BUFFER][DS18B20_ID_L];
+    devId(idList, PATH, DS18B20_HEAD);
+    for(int i = 0; i < num; i++) 
+        printf("device ID: %s\n", idList[i]);
+    
+    //get Paths
+    char pathList[DS18B20_BUFFER][DS18B20_PATH_L];
+    devPath(pathList, idList, PATH, num);
+    for(int i = 0; i < num; i++)
+        printf("device Path: %s\n", pathList[i]);
+
+    //get float
+    float tempList[DS18B20_BUFFER];
+    devTemp(tempList, pathList, num, DS18B20_DATA_LENGTH);
+    for(int i = 0; i < num; i++)
+        printf("%lf  ", tempList[i]);
+    printf("\n");
+    
+    //loop
+    while(1) {
+        devTemp(tempList, pathList, num, DS18B20_DATA_LENGTH);
+        for(int i = 0; i < num; i++)
+            printf("%lf  ", tempList[i]);
+        printf("C\n");
+    }
+
+
+
+
+    return 0;
+} 
 
 // Count the number of DS18B20 in the bus 
 uint8_t numDev(const char* devpath, const char* devhead) {
@@ -92,42 +125,3 @@ void devTemp(float tempList[DS18B20_BUFFER], char pathList[DS18B20_BUFFER][DS18B
         close(fd);
     }
 }
-
-int main() {
-    //setup 
-    uint8_t num;
-    num = numDev(PATH,DS18B20_HEAD);
-    printf("number of device: %i\n", num);
-
-    //get IDs
-    char idList[DS18B20_BUFFER][DS18B20_ID_L];
-    devId(idList, PATH, DS18B20_HEAD);
-    for(int i = 0; i < num; i++) 
-        printf("device ID: %s\n", idList[i]);
-    
-    //get Paths
-    char pathList[DS18B20_BUFFER][DS18B20_PATH_L];
-    devPath(pathList, idList, PATH, num);
-    for(int i = 0; i < num; i++)
-        printf("device Path: %s\n", pathList[i]);
-
-    //get float
-    float tempList[DS18B20_BUFFER];
-    devTemp(tempList, pathList, num, DS18B20_DATA_LENGTH);
-    for(int i = 0; i < num; i++)
-        printf("%lf  ", tempList[i]);
-    printf("\n");
-    
-    //loop
-    while(1) {
-        devTemp(tempList, pathList, num, DS18B20_DATA_LENGTH);
-        for(int i = 0; i < num; i++)
-            printf("%lf  ", tempList[i]);
-        printf("C\n");
-    }
-
-
-
-
-        return 0;
-    } 
