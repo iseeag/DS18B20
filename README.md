@@ -7,8 +7,10 @@ or read the datasheet: http://datasheets.maximintegrated.com/en/ds/DS18B20.pdf
 
 The setup script does the following: 
 add modules through command lines: 
+~~~
 sudo modprobe w1-gpio
 sudo modprobe w1-therm 
+~~~
 Try overlay if /sys/bus/w1/devices couldn't be found by adding 'dtoverlay=w1-gpio' (without the quotes) to /boot/config.txt 
 more details: https://github.com/raspberrypi/firmware/tree/master/boot/overlays
 
