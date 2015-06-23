@@ -1,6 +1,8 @@
 DS18B20 RaspberryPi demo 
 ======
 this c++ code can be used with up to 8 sensors in a single bus, but I have no idea how slow it would be
+The sensor needs a pull up resistor of about 5k ohm. 
+or read the datasheet: http://datasheets.maximintegrated.com/en/ds/DS18B20.pdf
 
 
 The setup script does the following: 
